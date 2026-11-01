@@ -13,6 +13,7 @@ import { LoginScreen } from './components/LoginScreen';
 import { VoiceSparkView } from './components/VoiceSparkView';
 import { ExportModal } from './components/ExportModal';
 import { RecentActivityPanel } from './components/RecentActivityPanel';
+import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { initialMemoryItems, initialRecentActivities } from './data/mockData';
 import { ActiveView, MemoryItem, UserProfile, Message, RecentActivityOperation } from './types';
 import { getSavedUserProfile, isSuperAdminAccount } from './core/security';
@@ -36,6 +37,7 @@ export default function App() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isRecentActivityOpen, setIsRecentActivityOpen] = useState(false);
+  const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
   const [slidesInitialPrompt, setSlidesInitialPrompt] = useState<string | undefined>(undefined);
   const [slidesInitialConditions, setSlidesInitialConditions] = useState<any | undefined>(undefined);
 
@@ -158,20 +160,7 @@ export default function App() {
     []
   );
 
-  // Global hotkey listener: Alt+A or Ctrl+H to toggle Recent Activity panel
-  useEffect(() => {
-    const handleGlobalKeys = (e: KeyboardEvent) => {
-      if (
-        (e.altKey && e.key.toLowerCase() === 'a') ||
-        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h' && !e.shiftKey)
-      ) {
-        e.preventDefault();
-        setIsRecentActivityOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleGlobalKeys);
-    return () => window.removeEventListener('keydown', handleGlobalKeys);
-  }, []);
+
 
   // Reading progress tracking across long-form generated responses and research artifacts
   const [readingProgress, setReadingProgress] = useState<number>(0);
@@ -388,6 +377,99 @@ export default function App() {
     showToast('New Editorial Synthesis session initialized');
   };
 
+  // Comprehensive Global Hotkeys Listener: Shift + / (or ?) for cheat sheet, Alt+1..0 for views, Alt+A / Ctrl+B / Ctrl+J / Ctrl+E
+  useEffect(() => {
+    const handleGlobalKeys = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isInput =
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable);
+
+      // 1. Shift + ? or Shift + / triggers Keyboard Shortcuts Cheat Sheet overlay
+      if (!isInput && (e.key === '?' || (e.shiftKey && (e.key === '/' || e.code === 'Slash')))) {
+        e.preventDefault();
+        setIsShortcutsModalOpen((prev) => !prev);
+        return;
+      }
+
+      // 2. Escape dismisses any open overlay
+      if (e.key === 'Escape') {
+        if (isShortcutsModalOpen) {
+          setIsShortcutsModalOpen(false);
+          return;
+        }
+        if (isRecentActivityOpen) {
+          setIsRecentActivityOpen(false);
+          return;
+        }
+        if (isExportModalOpen) {
+          setIsExportModalOpen(false);
+          return;
+        }
+      }
+
+      // If user is typing in an active input or textarea, skip app hotkeys
+      if (isInput) return;
+
+      // 3. Toggle Recent Activity panel: Alt + A or Ctrl/Cmd + H
+      if (
+        (e.altKey && e.key.toLowerCase() === 'a') ||
+        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h' && !e.shiftKey)
+      ) {
+        e.preventDefault();
+        setIsRecentActivityOpen((prev) => !prev);
+        return;
+      }
+
+      // 4. Toggle Sidebar Collapse: Ctrl/Cmd + B
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        setSidebarCollapsed((prev) => !prev);
+        return;
+      }
+
+      // 5. Open Export PDF Modal: Ctrl/Cmd + E
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'e') {
+        e.preventDefault();
+        setIsExportModalOpen(true);
+        return;
+      }
+
+      // 6. Start New Session: Ctrl/Cmd + J
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'j') {
+        e.preventDefault();
+        handleNewSession();
+        return;
+      }
+
+      // 7. Instant View Navigation: Alt + 1..0
+      if (e.altKey && !e.ctrlKey && !e.metaKey) {
+        const viewMap: Record<string, ActiveView> = {
+          '1': 'chat-studio',
+          '2': 'google-slides',
+          '3': 'manus-agent',
+          '4': 'research-search',
+          '5': 'notes-artifacts',
+          '6': 'outbox-dashboard',
+          '7': 'memory-context',
+          '8': 'voicespark',
+          '9': 'settings-security',
+          '0': 'design-system',
+        };
+        const nextView = viewMap[e.key];
+        if (nextView) {
+          e.preventDefault();
+          setActiveView(nextView);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeys);
+    return () => window.removeEventListener('keydown', handleGlobalKeys);
+  }, [isShortcutsModalOpen, isRecentActivityOpen, isExportModalOpen]);
+
   const sendMessage = async (input: string) => {
     const textToSend = input.trim();
     if (!textToSend || isThinking) return;
@@ -552,6 +634,7 @@ export default function App() {
         onLogout={handleLogout}
         onOpenRecentActivity={() => setIsRecentActivityOpen(true)}
         recentActivityCount={recentActivities.length}
+        onOpenKeyboardShortcuts={() => setIsShortcutsModalOpen(true)}
       />
 
       {/* Main App Container */}
@@ -582,6 +665,7 @@ export default function App() {
           isGenerating={isThinking || readingIsStreaming}
           onOpenRecentActivity={() => setIsRecentActivityOpen(true)}
           recentActivityCount={recentActivities.length}
+          onOpenKeyboardShortcuts={() => setIsShortcutsModalOpen(true)}
           onScrollToTop={() => {
             const container =
               document.getElementById('chat-messages-container') ||
@@ -798,6 +882,17 @@ export default function App() {
         onReaccess={handleReaccessActivity}
         onClearHistory={handleClearRecentActivities}
         onTriggerQuickTask={handleTriggerQuickTask}
+      />
+
+      {/* Keyboard Shortcuts Cheat Sheet Modal */}
+      <KeyboardShortcutsModal
+        isOpen={isShortcutsModalOpen}
+        onClose={() => setIsShortcutsModalOpen(false)}
+        onNavigateView={(view) => setActiveView(view)}
+        onToggleSidebar={() => setSidebarCollapsed((prev) => !prev)}
+        onToggleRecentActivity={() => setIsRecentActivityOpen((prev) => !prev)}
+        onNewSession={handleNewSession}
+        onOpenExportModal={() => setIsExportModalOpen(true)}
       />
     </div>
   );

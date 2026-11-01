@@ -26,6 +26,7 @@ interface HeaderProps {
   isGenerating?: boolean;
   onOpenRecentActivity?: () => void;
   recentActivityCount?: number;
+  onOpenKeyboardShortcuts?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -44,6 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
   isGenerating = false,
   onOpenRecentActivity,
   recentActivityCount,
+  onOpenKeyboardShortcuts,
 }) => {
   const activeStreaming = isStreaming || isGenerating;
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
@@ -228,6 +230,18 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
+        {/* Keyboard Shortcuts Button (Desktop & Tablet) */}
+        {onOpenKeyboardShortcuts && (
+          <button
+            onClick={onOpenKeyboardShortcuts}
+            className="hidden md:flex w-9 h-9 rounded-xl bg-white border border-slate-200 hover:border-indigo-400 hover:bg-slate-50 text-slate-700 shadow-2xs transition-all cursor-pointer items-center justify-center shrink-0"
+            title="Keyboard Shortcuts (Shift + ?)"
+            aria-label="Keyboard Shortcuts"
+          >
+            <span className="material-symbols-outlined text-[18px]">keyboard</span>
+          </button>
+        )}
+
         {/* User Account / Login Button (Clean, Icon-Only) */}
         {currentUser ? (
           <div className="relative shrink-0">
@@ -263,6 +277,24 @@ export const Header: React.FC<HeaderProps> = ({
                       {currentUser.role || 'Member'}
                     </div>
                   </div>
+
+                  {onOpenKeyboardShortcuts && (
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        onOpenKeyboardShortcuts();
+                      }}
+                      className="w-full flex items-center justify-between px-3 py-2 text-xs text-slate-800 hover:bg-slate-50 rounded-xl transition-colors text-left cursor-pointer font-medium"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[16px] text-indigo-700">keyboard</span>
+                        <span>Shortcuts Cheat Sheet</span>
+                      </div>
+                      <kbd className="px-1.5 py-0.5 rounded bg-slate-100 text-[10px] font-code text-slate-600 font-bold border border-slate-200">
+                        ?
+                      </kbd>
+                    </button>
+                  )}
 
                   {onOpenLogin && (
                     <button
