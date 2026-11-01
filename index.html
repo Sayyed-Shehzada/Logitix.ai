@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <title>LOGITIX AI Studio</title>
+    <script>
+      // Gracefully prevent unhandled WebSocket/HMR disconnect rejections in the cloud preview iframe
+      window.addEventListener('unhandledrejection', function(event) {
+        var reason = event.reason;
+        var msg = String((reason && (reason.message || reason.stack || reason)) || '');
+        if (
+          msg.includes('WebSocket') ||
+          msg.includes('vite:ws') ||
+          msg.includes('closed without opened') ||
+          msg.includes('auth/network-request-failed') ||
+          msg.includes('network-request-failed')
+        ) {
+          event.preventDefault();
+        }
+      });
+      window.addEventListener('error', function(event) {
+        var msg = String((event && (event.message || event.filename)) || '');
+        if (
+          msg.includes('WebSocket') ||
+          msg.includes('vite:ws') ||
+          msg.includes('closed without opened')
+        ) {
+          event.preventDefault();
+        }
+      });
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="description" content="LOGITIX AI Studio - Executive Assistant powered by Gemini, Claude, Manus & OpenAI" />
+    <meta property="og:title" content="LOGITIX AI Studio" />
+    <meta property="og:description" content="LOGITIX AI Studio - Executive Assistant powered by Gemini, Claude, Manus & OpenAI" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

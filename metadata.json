@@ -1,0 +1,8 @@
+{
+  "name": "LOGITIX",
+  "description": "LOGITIX AI Executive Assistant powered by Google,Claude,Manus,Deepseek,OpenAI",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

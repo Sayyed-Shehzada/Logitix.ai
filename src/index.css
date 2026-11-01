@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Newsreader", Georgia, Cambria, serif;
+  --font-body: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-code: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Touch-friendly momentum scrolling for iOS and mobile browsers */
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+.overflow-auto {
+  -webkit-overflow-scrolling: touch;
+  touch-action: auto;
+}
+
+/* Mobile Safe-Area and Touch Ergonomics */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+}
+
+.pt-safe {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+
+/* Hide scrollbar for carousels while keeping smooth swipe */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@layer utilities {
+  .bg-frosted-canvas {
+    background: radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+                #090714;
+  }
+  .bg-light-canvas {
+    background: radial-gradient(circle at 10% 10%, rgba(243, 232, 255, 0.6) 0%, transparent 50%),
+                radial-gradient(circle at 90% 90%, rgba(224, 242, 254, 0.6) 0%, transparent 50%),
+                #f8fafc;
+  }
+  .glass-card-dark {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .glass-card-light {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  }
+  .glow-purple {
+    box-shadow: 0 0 20px -3px rgba(168, 85, 247, 0.35);
+  }
+  .glow-blue {
+    box-shadow: 0 0 20px -3px rgba(59, 130, 246, 0.35);
+  }
+  .glow-emerald {
+    box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.35);
+  }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.25);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.45);
+}
+
+/* Smooth selection */
+::selection {
+  background: rgba(168, 85, 247, 0.3);
+  color: inherit;
+}
+
+/* Subtle Shimmer Animation for Reading Progress Bar during Content Streaming */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+
